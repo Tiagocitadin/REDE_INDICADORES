@@ -1,0 +1,22 @@
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+.DS_Store
+npm-debug.*
+yarn-error.*
+
+# variáveis de ambiente
+.env
+.env*.local
+
+# nativo gerado (EAS gera na nuvem)
+/ios
+/android

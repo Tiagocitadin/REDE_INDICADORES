@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Rede de Indicações",
+    "slug": "rede-indicacoes",
+    "scheme": "redeindicacoes",
+    "version": "1.0.0",
+    "orientation": "default",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "bundleIdentifier": "com.redeindicacoes.app",
+      "supportsTablet": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.redeindicacoes.app",
+      "edgeToEdgeEnabled": true,
+      "allowBackup": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
