@@ -28,7 +28,7 @@ type Props = {
  * e largura máxima em telas grandes (tablet/computador).
  */
 export function Tela({ titulo, subtitulo, acao, children, rolar = true, atualizando, aoAtualizar }: Props) {
-  const { cores, espaco } = useTema();
+  const { cores, espaco, telaPequena } = useTema();
   const comBarra = useContext(ComBarraTopo);
 
   const cabecalho = titulo ? (
@@ -48,7 +48,7 @@ export function Tela({ titulo, subtitulo, acao, children, rolar = true, atualiza
   ) : null;
 
   const conteudo = (
-    <View style={[estilos.conteudo, { padding: espaco.xl, gap: espaco.lg }]}>
+    <View style={[estilos.conteudo, { padding: telaPequena ? espaco.lg : espaco.xl, gap: espaco.lg }]}>
       {cabecalho}
       {children}
     </View>

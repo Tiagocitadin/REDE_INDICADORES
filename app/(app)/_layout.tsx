@@ -11,9 +11,10 @@ import { useTema } from '@/theme/useTema';
 
 type NomeIcone = ComponentProps<typeof Ionicons>['name'];
 
-const icone =
-  (nome: NomeIcone) =>
-  ({ color, size }: { color: string; size: number }) => <Ionicons name={nome} color={color} size={size} />;
+const icone = (nome: NomeIcone) =>
+  function IconeAba({ color, size }: { color: string; size: number }) {
+    return <Ionicons name={nome} color={color} size={size} />;
+  };
 
 /**
  * Área logada. Protege todas as telas internas:

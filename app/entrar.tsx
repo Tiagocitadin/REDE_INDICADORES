@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 
-import { Botao, Campo, MensagemErro, Tela, Texto } from '@/components/ui';
+import { Botao, Campo, Logo, MensagemErro, Tela, Texto } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { criarConta, entrar, esquemaCadastro, esquemaLogin, recuperarSenha, type DadosLogin } from '@/features/auth/api';
 import { useTema } from '@/theme/useTema';
@@ -20,7 +20,7 @@ export default function TelaEntrar() {
 
   const { control, handleSubmit, formState, getValues } = useForm<DadosLogin>({
     resolver: zodResolver(modo === 'entrar' ? esquemaLogin : esquemaCadastro),
-    defaultValues: { email: '', senha: '' },
+    defaultValues: { nome: '', email: '', senha: '' },
   });
 
   if (sessao) return <Redirect href="/" />;
@@ -63,12 +63,33 @@ export default function TelaEntrar() {
       <Tela>
         <View style={{ flex: 1, justifyContent: 'center', width: '100%', maxWidth: 420, alignSelf: 'center', gap: 16 }}>
           <View style={{ gap: 4, marginBottom: 8 }}>
+            <View style={{ marginBottom: 12 }}>
+              <Logo tamanho={56} />
+            </View>
             <Texto variante="pequeno" suave negrito>
               Rede de Indicações
             </Texto>
             <Texto variante="titulo">{modo === 'entrar' ? 'Entrar' : 'Criar conta'}</Texto>
           </View>
 
+          {modo === 'criar' ? (
+            <Controller
+              control={control}
+              name="nome"
+              render={({ field }) => (
+                <Campo
+                  rotulo="Seu nome"
+                  value={field.value}
+                  onChangeText={field.onChange}
+                  onBlur={field.onBlur}
+                  autoCapitalize="words"
+                  autoComplete="name"
+                  textContentType="name"
+                  erro={formState.errors.nome?.message}
+                />
+              )}
+            />
+          ) : null}
           <Controller
             control={control}
             name="email"

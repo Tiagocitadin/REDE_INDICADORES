@@ -4,23 +4,16 @@ import { View } from 'react-native';
 
 import { Botao, Carregando, MensagemErro, Tela, Vazio } from '@/components/ui';
 import { FiltroCurso } from '@/features/cursos/FiltroCurso';
-import { useOrganizacao } from '@/features/organizacao/OrganizacaoProvider';
 import { DestaqueRede, PorNivel, SituacaoCurso } from '@/features/rede/componentes/PainelResumo';
 import { Ranking } from '@/features/rede/componentes/Ranking';
 import { useResumoRede } from '@/features/rede/rede';
 
 export default function Painel() {
-  const { atual } = useOrganizacao();
   const [cursoId, setCursoId] = useState<string | null>(null);
   const resumo = useResumoRede(null, cursoId);
 
   return (
-    <Tela
-      titulo="Minha rede"
-      subtitulo={atual?.nome}
-      atualizando={resumo.isRefetching}
-      aoAtualizar={resumo.refetch}
-    >
+    <Tela titulo="Minha rede" atualizando={resumo.isRefetching} aoAtualizar={resumo.refetch}>
       <FiltroCurso valor={cursoId} aoMudar={setCursoId} />
 
       {resumo.isPending ? <Carregando /> : null}

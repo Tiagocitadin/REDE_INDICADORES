@@ -1,3 +1,4 @@
+import type { User } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 import { traduzirErro } from '@/lib/errors';
@@ -9,6 +10,7 @@ export const esquemaLogin = z.object({
 });
 
 export const esquemaCadastro = z.object({
+  nome: z.string().trim().min(2, 'Digite seu nome.').max(80, 'Nome muito longo.'),
   email: z.string().trim().toLowerCase().email('Digite um e-mail válido.'),
   senha: z
     .string()
@@ -17,7 +19,8 @@ export const esquemaCadastro = z.object({
     .regex(/[0-9]/, 'Use pelo menos um número.'),
 });
 
-export type DadosLogin = z.infer<typeof esquemaLogin>;
+/** No login o nome não é usado; no cadastro ele é obrigatório */
+export type DadosLogin = z.infer<typeof esquemaLogin> & { nome?: string };
 
 export async function entrar({ email, senha }: DadosLogin) {
   const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
@@ -25,14 +28,39 @@ export async function entrar({ email, senha }: DadosLogin) {
 }
 
 /** Retorna true se precisa confirmar o e-mail antes de entrar */
-export async function criarConta({ email, senha }: DadosLogin): Promise<boolean> {
-  const { data, error } = await supabase.auth.signUp({ email, password: senha });
+export async function criarConta({ nome, email, senha }: DadosLogin): Promise<boolean> {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password: senha,
+    options: { data: { nome: nome?.trim().replace(/\s+/g, ' ') } },
+  });
   if (error) throw traduzirErro(error);
   return !data.session;
 }
 
 export async function recuperarSenha(email: string) {
   const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase());
+  if (error) throw traduzirErro(error);
+}
+
+/** Nome guardado na conta (Ajustes → Seu nome) */
+export function nomeDaConta(usuario: User | undefined): string {
+  const nome = usuario?.user_metadata?.nome;
+  return typeof nome === 'string' ? nome.trim() : '';
+}
+
+/** Primeiro nome para exibir; sem nome salvo, usa o começo do e-mail */
+export function primeiroNome(usuario: User | undefined): string {
+  const base = nomeDaConta(usuario) || (usuario?.email?.split('@')[0] ?? '').replace(/[._\-\d]+/g, ' ');
+  const primeiro = base.trim().split(/\s+/)[0] ?? '';
+  return primeiro ? primeiro[0]!.toUpperCase() + primeiro.slice(1).toLowerCase() : '';
+}
+
+export async function salvarNome(nome: string) {
+  const limpo = nome.trim().replace(/\s+/g, ' ');
+  if (limpo.length < 2) throw new Error('Digite seu nome.');
+  if (limpo.length > 80) throw new Error('Nome muito longo.');
+  const { error } = await supabase.auth.updateUser({ data: { nome: limpo } });
   if (error) throw traduzirErro(error);
 }
 

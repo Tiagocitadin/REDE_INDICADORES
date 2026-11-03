@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Avatar, BotaoTema, Confirmacao, Texto } from '@/components/ui';
+import { Avatar, BotaoTema, Confirmacao, Logo, Texto } from '@/components/ui';
+import { primeiroNome } from '@/features/auth/api';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useOrganizacao } from '@/features/organizacao/OrganizacaoProvider';
 import { useTema } from '@/theme/useTema';
@@ -22,6 +23,7 @@ export function BarraTopo() {
   const [saindo, setSaindo] = useState(false);
 
   const email = sessao?.user.email ?? '';
+  const nome = primeiroNome(sessao?.user);
 
   return (
     <View
@@ -37,9 +39,7 @@ export function BarraTopo() {
       ]}
     >
       <View style={estilos.marca}>
-        <View style={[estilos.logo, { backgroundColor: cores.heroi }]}>
-          <Ionicons name="git-network-outline" size={18} color={cores.heroiTexto} />
-        </View>
+        <Logo tamanho={34} />
         <View style={{ flexShrink: 1 }}>
           <Texto variante="pequeno" negrito numberOfLines={1}>
             Rede de Indicações
@@ -57,14 +57,14 @@ export function BarraTopo() {
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Conta ${email}. Abrir ajustes`}
+          accessibilityLabel={`Conta de ${nome || email}. Abrir ajustes`}
           onPress={() => router.push('/ajustes')}
           style={({ pressed }) => [estilos.conta, { opacity: pressed ? 0.8 : 1 }]}
         >
-          <Avatar nome={email.split('@')[0]?.replace(/[._-]+/g, ' ') ?? '?'} tamanho={36} forte />
-          {telaLarga ? (
-            <Texto variante="pequeno" suave numberOfLines={1} style={{ maxWidth: 200 }}>
-              {email}
+          <Avatar nome={nome || '?'} tamanho={36} forte />
+          {telaLarga && nome ? (
+            <Texto variante="pequeno" negrito numberOfLines={1} style={{ maxWidth: 160 }}>
+              {nome}
             </Texto>
           ) : null}
         </Pressable>
@@ -116,7 +116,6 @@ const estilos = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   marca: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1 },
-  logo: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   acoes: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   conta: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, paddingHorizontal: 2 },
   sair: {
