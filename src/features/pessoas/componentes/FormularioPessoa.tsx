@@ -170,8 +170,9 @@ export function FormularioPessoa({
             valor={field.value || null}
             opcoes={opcoesCursos}
             aoMudar={field.onChange}
-            placeholder="Escolha o curso"
+            placeholder={cursos && !opcoesCursos.length ? 'Nenhum curso cadastrado' : 'Escolha o curso'}
             erro={e.cursoId?.message}
+            ajuda={cursos && !opcoesCursos.length ? 'Cadastre os cursos na aba Cursos.' : undefined}
           />
         )}
       />

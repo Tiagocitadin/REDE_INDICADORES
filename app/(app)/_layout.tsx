@@ -62,6 +62,7 @@ export default function AppLayout() {
         <Tabs.Screen name="arvore" options={{ title: 'Árvore', tabBarIcon: icone('git-network-outline') }} />
         <Tabs.Screen name="cadastrar" options={{ title: 'Cadastrar', tabBarIcon: icone('person-add-outline') }} />
         <Tabs.Screen name="pessoas" options={{ title: 'Pessoas', tabBarIcon: icone('people-outline') }} />
+        <Tabs.Screen name="cursos" options={{ title: 'Cursos', tabBarIcon: icone('school-outline') }} />
         <Tabs.Screen name="ajustes" options={{ title: 'Ajustes', tabBarIcon: icone('settings-outline') }} />
       </Tabs>
     </ComBarraTopo.Provider>
