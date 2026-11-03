@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { Botao, Campo, Cartao, Carregando, MensagemErro, Tela, Texto } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { trocarSenha } from '@/features/auth/api';
+import { nomeDaConta, salvarNome, trocarSenha } from '@/features/auth/api';
 import { esquemaCurso, useAtualizarCurso, useCriarCurso, useCursos } from '@/features/cursos/cursos';
 import { useOrganizacao } from '@/features/organizacao/OrganizacaoProvider';
 import { useTema } from '@/theme/useTema';
@@ -21,6 +21,19 @@ export default function Ajustes() {
   const [erroCampo, setErroCampo] = useState<string>();
   const [senha, setSenha] = useState('');
   const [estadoSenha, setEstadoSenha] = useState<{ ok?: boolean; erro?: unknown; salvando?: boolean }>({});
+
+  const [nome, setNome] = useState(() => nomeDaConta(sessao?.user));
+  const [estadoNome, setEstadoNome] = useState<{ ok?: boolean; erro?: unknown; salvando?: boolean }>({});
+
+  const salvarMeuNome = async () => {
+    setEstadoNome({ salvando: true });
+    try {
+      await salvarNome(nome);
+      setEstadoNome({ ok: true });
+    } catch (e) {
+      setEstadoNome({ erro: e });
+    }
+  };
 
   const salvarSenha = async () => {
     setEstadoSenha({ salvando: true });
@@ -105,6 +118,33 @@ export default function Ajustes() {
         <Texto variante="pequeno" suave>
           {atual?.nome} · {atual ? rotuloPapel[atual.papel] : ''}
         </Texto>
+        <Campo
+          rotulo="Seu nome"
+          value={nome}
+          onChangeText={(t) => {
+            setNome(t);
+            setEstadoNome({});
+          }}
+          autoCapitalize="words"
+          autoComplete="name"
+          textContentType="name"
+          onSubmitEditing={salvarMeuNome}
+          ajuda="Aparece no topo do app."
+        />
+        {estadoNome.erro ? <MensagemErro erro={estadoNome.erro} /> : null}
+        {estadoNome.ok ? (
+          <Texto variante="pequeno" cor={cores.concluido}>
+            Nome salvo.
+          </Texto>
+        ) : null}
+        <Botao
+          titulo="Salvar nome"
+          variante="secundario"
+          compacto
+          desabilitado={!nome.trim() || nome.trim() === nomeDaConta(sessao?.user)}
+          carregando={estadoNome.salvando}
+          aoPressionar={salvarMeuNome}
+        />
         <Campo
           rotulo="Nova senha"
           value={senha}

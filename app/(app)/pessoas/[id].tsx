@@ -48,7 +48,7 @@ function Linha({ rotulo, valor, aoPressionar }: { rotulo: string; valor: string;
 
 export default function FichaPessoa() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { cores } = useTema();
+  const { cores, telaPequena } = useTema();
   const { podeGerenciar } = useOrganizacao();
   const nomesCursos = useNomesCursos();
   const ficha = usePessoa(id);
@@ -97,7 +97,7 @@ export default function FichaPessoa() {
       </View>
 
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-        <Avatar nome={pessoa.nome} tamanho={60} />
+        <Avatar nome={pessoa.nome} tamanho={telaPequena ? 48 : 60} />
         <View style={{ flex: 1, gap: 6 }}>
           <Texto variante="titulo" accessibilityRole="header">
             {pessoa.nome}
@@ -144,7 +144,7 @@ export default function FichaPessoa() {
 
       <Cartao titulo={`Rede de ${primeiroNome}`}>
         {resumo.data ? (
-          <View style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
             <Numero valor={resumo.data.diretas} rotulo="diretas (indicou)" />
             <Numero valor={resumo.data.indiretas} rotulo="indiretas abaixo" />
             <Numero valor={resumo.data.concluidos} rotulo="concluíram" cor={cores.concluido} />
@@ -163,7 +163,7 @@ export default function FichaPessoa() {
             <Texto style={{ flex: 1 }} numberOfLines={1}>
               {f.nome}
             </Texto>
-            <Texto variante="legenda" suave>
+            <Texto variante="legenda" suave numberOfLines={1} style={{ flexShrink: 1, maxWidth: '55%', textAlign: 'right' }}>
               {f.curso_nome} · {rotuloStatus[f.status as StatusCurso]}
             </Texto>
           </Pressable>
@@ -202,7 +202,7 @@ export default function FichaPessoa() {
 function Numero({ valor, rotulo, cor }: { valor: number; rotulo: string; cor?: string }) {
   const { cores, raio } = useTema();
   return (
-    <View style={{ flex: 1, backgroundColor: cores.fundo, borderRadius: raio.md, padding: 10 }}>
+    <View style={{ flexGrow: 1, flexBasis: 90, backgroundColor: cores.fundo, borderRadius: raio.md, padding: 10 }}>
       <Texto variante="titulo" cor={cor}>
         {valor}
       </Texto>

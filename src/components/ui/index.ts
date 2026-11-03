@@ -7,6 +7,7 @@ export { Chip, GrupoChips } from './Chip';
 export { CaixaMarcacao, Confirmacao, Segmentado } from './Controles';
 export { Aviso, Carregando, MensagemErro, Vazio } from './Estados';
 export { Seletor, type OpcaoSeletor } from './Seletor';
+export { Logo } from './Logo';
 export { Etiqueta, PontoStatus, SeloStatus } from './Status';
 export { ComBarraTopo, Tela } from './Tela';
 export { Texto } from './Texto';

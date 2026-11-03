@@ -1,5 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTema } from '@/theme/useTema';
 import { Botao } from './Botao';
@@ -121,24 +122,47 @@ export function Confirmacao({
   aoConfirmar: () => void;
   aoCancelar: () => void;
 }) {
-  const { cores, raio } = useTema();
+  const { cores, raio, telaPequena } = useTema();
+  const insets = useSafeAreaInsets();
   return (
-    <Modal visible={visivel} transparent animationType="fade" onRequestClose={aoCancelar}>
-      <View style={estilos.fundo}>
-        <View style={[estilos.dialogo, { backgroundColor: cores.superficie, borderRadius: raio.lg }]} accessibilityViewIsModal>
-          <Texto variante="subtitulo">{titulo}</Texto>
-          <Texto variante="pequeno" suave>
-            {texto}
-          </Texto>
+    <Modal
+      visible={visivel}
+      transparent
+      animationType="fade"
+      statusBarTranslucent
+      navigationBarTranslucent
+      onRequestClose={aoCancelar}
+    >
+      <View
+        style={[
+          estilos.fundo,
+          {
+            padding: telaPequena ? 16 : 24,
+            paddingTop: insets.top + 16,
+            paddingBottom: insets.bottom + 16,
+          },
+        ]}
+      >
+        <View
+          style={[estilos.dialogo, { backgroundColor: cores.superficie, borderRadius: raio.lg, padding: telaPequena ? 16 : 20 }]}
+          accessibilityViewIsModal
+        >
+          {/* texto rola se a tela for baixa (celular deitado); botões ficam sempre visíveis */}
+          <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 12 }}>
+            <Texto variante="subtitulo">{titulo}</Texto>
+            <Texto variante="pequeno" suave>
+              {texto}
+            </Texto>
+          </ScrollView>
           <View style={estilos.botoes}>
-            <Botao titulo="Cancelar" variante="secundario" compacto aoPressionar={aoCancelar} style={{ flex: 1 }} />
+            <Botao titulo="Cancelar" variante="secundario" compacto aoPressionar={aoCancelar} style={estilos.botao} />
             <Botao
               titulo={rotuloConfirmar}
               variante={perigo ? 'perigo' : 'primario'}
               compacto
               carregando={carregando}
               aoPressionar={aoConfirmar}
-              style={{ flex: 1 }}
+              style={estilos.botao}
             />
           </View>
         </View>
@@ -151,7 +175,9 @@ const estilos = StyleSheet.create({
   linha: { flexDirection: 'row', gap: 8 },
   opcao: { flex: 1, minHeight: 44, borderWidth: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   caixaLinha: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, minHeight: 44, paddingTop: 2 },
-  fundo: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center', padding: 24 },
-  dialogo: { width: '100%', maxWidth: 420, padding: 20, gap: 12 },
-  botoes: { flexDirection: 'row', gap: 10, marginTop: 8 },
+  fundo: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center' },
+  dialogo: { width: '100%', maxWidth: 420, maxHeight: '100%', gap: 12 },
+  // em tela estreita os botões descem um embaixo do outro em vez de cortar o texto
+  botoes: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 8 },
+  botao: { flexGrow: 1, flexBasis: 120 },
 });

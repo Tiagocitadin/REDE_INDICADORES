@@ -1,20 +1,20 @@
 /**
- * Identidade visual centralizada (paleta Verde-mata).
+ * Identidade visual centralizada (paleta Cobre, a partir do logo).
  * Mudar cores, fontes ou espaçamentos do app inteiro é mexer só neste arquivo.
  */
 export const paletaClara = {
-  fundo: "#F1F4F2",
+  fundo: "#F7F3EF",
   superficie: "#FFFFFF",
-  superficieSuave: "#E9EFEB",
-  texto: "#14231C",
-  textoSuave: "#56675E",
-  borda: "#D8E2DC",
-  bordaForte: "#C6D3CB",
-  destaque: "#1E5B45",
+  superficieSuave: "#F2EBE4",
+  texto: "#2A1A0F",
+  textoSuave: "#6E5A4B",
+  borda: "#E8DDD3",
+  bordaForte: "#D9C9BB",
+  destaque: "#B85A16",
   destaqueTexto: "#FFFFFF",
-  destaqueSuave: "#E2EEE8",
+  destaqueSuave: "#FBEADB",
   // cartão principal do painel
-  heroi: "#1E5B45",
+  heroi: "#A84F12",
   heroiTexto: "#FFFFFF",
   perigo: "#B42318",
   perigoSuave: "#FDECEA",
@@ -32,17 +32,17 @@ export const paletaClara = {
 export type Paleta = typeof paletaClara;
 
 export const paletaEscura: Paleta = {
-  fundo: "#0F1714",
-  superficie: "#18221D",
-  superficieSuave: "#1F2C26",
-  texto: "#E6EEE9",
-  textoSuave: "#9BADA3",
-  borda: "#29382F",
-  bordaForte: "#3A4B41",
-  destaque: "#7CCBA4",
-  destaqueTexto: "#0F1714",
-  destaqueSuave: "#1C3A2C",
-  heroi: "#1E5B45",
+  fundo: "#17110D",
+  superficie: "#211913",
+  superficieSuave: "#2B2119",
+  texto: "#F2E9E1",
+  textoSuave: "#B5A496",
+  borda: "#3A2D23",
+  bordaForte: "#4C3B2E",
+  destaque: "#F0954A",
+  destaqueTexto: "#17110D",
+  destaqueSuave: "#3D2615",
+  heroi: "#A84F12",
   heroiTexto: "#FFFFFF",
   perigo: "#F2857A",
   perigoSuave: "#3B1F1D",
@@ -81,6 +81,8 @@ export const fonte = {
 
 /** Largura a partir da qual o app usa menu lateral (tablet / computador) */
 export const LARGURA_TELA_LARGA = 900;
+/** Abaixo desta largura o app aperta margens e espaços */
+export const LARGURA_TELA_PEQUENA = 380;
 /** Largura máxima do conteúdo em telas grandes, para não esticar demais */
 export const LARGURA_MAX_CONTEUDO = 960;
 

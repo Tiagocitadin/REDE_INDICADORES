@@ -37,6 +37,8 @@ export function Etiqueta({ texto }: { texto: string }) {
   return (
     <View
       style={{
+        // encolhe (com reticências) quando falta espaço na linha
+        flexShrink: 1,
         borderColor: cores.borda,
         borderWidth: 1,
         borderRadius: raio.sm,

@@ -55,7 +55,7 @@ export function traduzirErro(erro: unknown): ErroApp {
  * Lança o erro traduzido se a resposta do Supabase tiver erro;
  * senão devolve os dados já sem o "null" (o Supabase só manda null junto com erro).
  */
-export function garantir<T>(resposta: { data: T | null; error: unknown }): T {
+export function garantir<R extends { data: unknown; error: unknown }>(resposta: R): NonNullable<R['data']> {
   if (resposta.error) throw traduzirErro(resposta.error);
-  return resposta.data as T;
+  return resposta.data as NonNullable<R['data']>;
 }

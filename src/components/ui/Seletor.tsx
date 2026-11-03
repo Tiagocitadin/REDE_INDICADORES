@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState, type ReactNode } from 'react';
-import { FlatList, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTema } from '@/theme/useTema';
 import { Carregando } from './Estados';
@@ -44,9 +44,16 @@ export function Seletor({
   destaque,
   icone,
 }: Props) {
-  const { cores, raio, fonte } = useTema();
+  const { cores, raio, fonte, telaLarga, alturaTela } = useTema();
+  const insets = useSafeAreaInsets();
   const [aberto, setAberto] = useState(false);
   const [busca, setBusca] = useState('');
+
+  const fechar = () => {
+    setAberto(false);
+    setBusca('');
+    if (busca) aoBuscar?.('');
+  };
 
   const atual = opcoes.find((o) => o.valor === valor);
   const textoAtual = rotuloValor ?? atual?.rotulo;
@@ -89,17 +96,46 @@ export function Seletor({
         </Texto>
       ) : null}
 
-      <Modal visible={aberto} animationType="slide" transparent onRequestClose={() => setAberto(false)}>
-        <View style={estilos.fundoModal}>
-          <SafeAreaView
-            edges={['bottom']}
-            style={[estilos.painel, { backgroundColor: cores.superficie, borderTopLeftRadius: raio.xl, borderTopRightRadius: raio.xl }]}
+      <Modal
+        visible={aberto}
+        animationType={telaLarga ? 'fade' : 'slide'}
+        transparent
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={fechar}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'web' ? undefined : 'padding'}
+          style={[
+            estilos.fundoModal,
+            {
+              justifyContent: telaLarga ? 'center' : 'flex-end',
+              paddingTop: insets.top + 24,
+              padding: telaLarga ? 24 : 0,
+            },
+          ]}
+        >
+          {/* tocar fora fecha */}
+          <Pressable style={StyleSheet.absoluteFill} onPress={fechar} accessibilityLabel="Fechar" accessibilityRole="button" />
+          <View
+            accessibilityViewIsModal
+            style={[
+              estilos.painel,
+              {
+                backgroundColor: cores.superficie,
+                borderRadius: raio.xl,
+                borderBottomLeftRadius: telaLarga ? raio.xl : 0,
+                borderBottomRightRadius: telaLarga ? raio.xl : 0,
+                paddingBottom: telaLarga ? 16 : Math.max(16, insets.bottom + 8),
+                maxHeight: telaLarga ? Math.min(640, alturaTela * 0.8) : '100%',
+              },
+            ]}
           >
             <View style={estilos.topoPainel}>
               <Texto variante="subtitulo" style={{ flex: 1 }}>
                 {rotulo}
               </Texto>
-              <Pressable accessibilityRole="button" accessibilityLabel="Fechar" onPress={() => setAberto(false)} hitSlop={12}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Fechar" onPress={fechar} hitSlop={12} style={estilos.fechar}>
                 <Ionicons name="close" size={24} color={cores.texto} />
               </Pressable>
             </View>
@@ -125,6 +161,8 @@ export function Seletor({
             />
             {buscando ? <Carregando texto="Buscando…" /> : null}
             <FlatList
+              // sem isso a lista ignora a altura máxima do painel e corta o fim
+              style={{ flexShrink: 1 }}
               data={filtradas}
               keyExtractor={(o) => o.valor}
               keyboardShouldPersistTaps="handled"
@@ -143,8 +181,7 @@ export function Seletor({
                     accessibilityState={{ selected: ativo }}
                     onPress={() => {
                       aoMudar(item.valor);
-                      setAberto(false);
-                      setBusca('');
+                      fechar();
                     }}
                     style={({ pressed }) => [
                       estilos.item,
@@ -164,8 +201,8 @@ export function Seletor({
                 );
               }}
             />
-          </SafeAreaView>
-        </View>
+          </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
@@ -173,8 +210,9 @@ export function Seletor({
 
 const estilos = StyleSheet.create({
   campo: { minHeight: 50, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  fundoModal: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' },
-  painel: { maxHeight: '80%', width: '100%', maxWidth: 640, alignSelf: 'center', padding: 16 },
-  topoPainel: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  fundoModal: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' },
+  painel: { width: '100%', maxWidth: 640, alignSelf: 'center', padding: 16, flexShrink: 1 },
+  topoPainel: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
+  fechar: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginRight: -10 },
   item: { minHeight: 52, flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 4, borderBottomWidth: StyleSheet.hairlineWidth },
 });

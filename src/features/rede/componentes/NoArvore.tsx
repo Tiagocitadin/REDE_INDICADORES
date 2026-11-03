@@ -34,7 +34,7 @@ export function GalhoArvore({ paiId, cursoId }: { paiId: string | null; cursoId:
  * então a árvore abre rápido mesmo com milhares de pessoas.
  */
 export const NoArvore = memo(function NoArvore({ no, cursoId }: { no: TipoNo; cursoId: string | null }) {
-  const { cores, raio } = useTema();
+  const { cores, raio, telaPequena } = useTema();
   const [aberto, setAberto] = useState(false);
   const temFilhos = no.diretas > 0;
   const apagado = !!cursoId && no.curso_id !== cursoId;
@@ -70,8 +70,9 @@ export const NoArvore = memo(function NoArvore({ no, cursoId }: { no: TipoNo; cu
           <Etiqueta texto={no.curso_nome} />
           {temFilhos ? (
             <View style={{ backgroundColor: cores.destaqueSuave, borderRadius: raio.pilula, paddingHorizontal: 8, paddingVertical: 2 }}>
-              <Texto variante="legenda" negrito cor={cores.destaque}>
-                trouxe {no.diretas}
+              <Texto variante="legenda" negrito cor={cores.destaque} numberOfLines={1}>
+                {telaPequena ? '+' : 'trouxe '}
+                {no.diretas}
               </Texto>
             </View>
           ) : null}
@@ -91,6 +92,7 @@ const estilos = StyleSheet.create({
   linha: { flexDirection: 'row', alignItems: 'center' },
   seta: { width: 28, height: 44, alignItems: 'center', justifyContent: 'center' },
   conteudo: { flex: 1, minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 6 },
-  nome: { flexShrink: 1 },
+  // em galhos fundos o nome tem prioridade; a etiqueta do curso encolhe antes
+  nome: { flexShrink: 1, minWidth: 72 },
   filhos: { marginLeft: 13, paddingLeft: 10, borderLeftWidth: 2 },
 });

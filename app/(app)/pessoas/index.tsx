@@ -22,7 +22,7 @@ function useAtrasado<T>(valor: T, ms = 300) {
 }
 
 export default function ListaPessoas() {
-  const { cores, raio, fonte } = useTema();
+  const { cores, raio, fonte, telaPequena } = useTema();
   const [busca, setBusca] = useState('');
   const [cursoId, setCursoId] = useState<string | null>(null);
   const termo = useAtrasado(busca);
@@ -36,7 +36,7 @@ export default function ListaPessoas() {
         <FlatList
           data={pessoas}
           keyExtractor={(p) => p.id}
-          contentContainerStyle={{ padding: 20, gap: 8 }}
+          contentContainerStyle={{ padding: telaPequena ? 16 : 20, gap: 8 }}
           keyboardShouldPersistTaps="handled"
           onEndReachedThreshold={0.4}
           onEndReached={() => {

@@ -70,7 +70,7 @@ export function Botao({
       ) : (
         <View style={estilos.linha}>
           {icone ? <Ionicons name={icone} size={18} color={a.texto} /> : null}
-          <Texto variante={compacto ? 'pequeno' : 'corpo'} negrito cor={a.texto}>
+          <Texto variante={compacto ? 'pequeno' : 'corpo'} negrito cor={a.texto} centro style={estilos.titulo}>
             {titulo}
           </Texto>
         </View>
@@ -81,5 +81,7 @@ export function Botao({
 
 const estilos = StyleSheet.create({
   base: { alignItems: 'center', justifyContent: 'center', minWidth: ALVO_TOQUE },
-  linha: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  linha: { flexDirection: 'row', alignItems: 'center', gap: 8, maxWidth: '100%', paddingVertical: 6 },
+  // títulos longos quebram linha em vez de vazar do botão
+  titulo: { flexShrink: 1 },
 });
