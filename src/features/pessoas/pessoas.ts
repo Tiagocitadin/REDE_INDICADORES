@@ -148,7 +148,7 @@ export function useCriarPessoa() {
       return garantir(
         await supabase
           .from('pessoas')
-          .insert({ ...paraBanco(dados), organizacao_id: org, consentimento_em: new Date().toISOString() })
+          .insert({ ...paraBanco(dados), organizacao_id: org })
           .select('id')
           .single(),
       );

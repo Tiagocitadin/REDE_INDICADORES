@@ -4,7 +4,7 @@ import { View } from 'react-native';
 
 import { Botao, Carregando, MensagemErro, Tela, Vazio } from '@/components/ui';
 import { FiltroCurso } from '@/features/cursos/FiltroCurso';
-import { DestaqueRede, PorNivel, SituacaoCurso } from '@/features/rede/componentes/PainelResumo';
+import { ImpactoElos } from '@/features/rede/componentes/PainelResumo';
 import { Ranking } from '@/features/rede/componentes/Ranking';
 import { useResumoRede } from '@/features/rede/rede';
 
@@ -27,9 +27,7 @@ export default function Painel() {
         />
       ) : resumo.data ? (
         <View style={{ gap: 16 }}>
-          <DestaqueRede resumo={resumo.data} titulo={'pessoas chegaram\natravés de você'} />
-          <SituacaoCurso resumo={resumo.data} />
-          <PorNivel resumo={resumo.data} />
+          <ImpactoElos resumo={resumo.data} />
           <Ranking cursoId={cursoId} />
         </View>
       ) : null}

@@ -1,6 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import {
@@ -8,7 +7,6 @@ import {
   Botao,
   Carregando,
   Cartao,
-  Confirmacao,
   Etiqueta,
   MensagemErro,
   PontoStatus,
@@ -17,8 +15,7 @@ import {
   Texto,
 } from '@/components/ui';
 import { useNomesCursos } from '@/features/cursos/cursos';
-import { useOrganizacao } from '@/features/organizacao/OrganizacaoProvider';
-import { useAnonimizarPessoa, usePessoa } from '@/features/pessoas/pessoas';
+import { usePessoa } from '@/features/pessoas/pessoas';
 import { useFilhos, useResumoRede } from '@/features/rede/rede';
 import { formatarData, formatarTelefone } from '@/lib/format';
 import { rotuloStatus, type StatusCurso } from '@/theme/status';
@@ -49,13 +46,10 @@ function Linha({ rotulo, valor, aoPressionar }: { rotulo: string; valor: string;
 export default function FichaPessoa() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { cores, telaPequena } = useTema();
-  const { podeGerenciar } = useOrganizacao();
   const nomesCursos = useNomesCursos();
   const ficha = usePessoa(id);
   const resumo = useResumoRede(id ?? null);
   const filhos = useFilhos(id ?? null, !!id);
-  const anonimizar = useAnonimizarPessoa();
-  const [confirmando, setConfirmando] = useState(false);
 
   const voltar = () => (router.canGoBack() ? router.back() : router.replace('/pessoas'));
 
@@ -82,21 +76,17 @@ export default function FichaPessoa() {
 
   return (
     <Tela atualizando={ficha.isRefetching} aoAtualizar={() => Promise.all([ficha.refetch(), resumo.refetch(), filhos.refetch()])}>
-      <View style={estilos.topo}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Voltar" onPress={voltar} hitSlop={10} style={estilos.voltar}>
-          <Ionicons name="chevron-back" size={24} color={cores.texto} />
+      {/* Cabeçalho: voltar, foto, nome e editar na mesma linha */}
+      <View style={estilos.cabecalho}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Voltar"
+          onPress={voltar}
+          hitSlop={10}
+          style={[estilos.voltar, { borderRadius: 22, backgroundColor: cores.superficie }]}
+        >
+          <Ionicons name="chevron-back" size={22} color={cores.texto} />
         </Pressable>
-        {!removida ? (
-          <Botao
-            titulo="Editar"
-            variante="secundario"
-            compacto
-            aoPressionar={() => router.push({ pathname: '/pessoas/editar/[id]', params: { id: pessoa.id } })}
-          />
-        ) : null}
-      </View>
-
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
         <Avatar nome={pessoa.nome} tamanho={telaPequena ? 48 : 60} />
         <View style={{ flex: 1, gap: 6 }}>
           <Texto variante="titulo" accessibilityRole="header">
@@ -108,6 +98,15 @@ export default function FichaPessoa() {
             <Etiqueta texto={pessoa.nivel === 1 ? 'Direta · nível 1' : `Indireta · nível ${pessoa.nivel}`} />
           </View>
         </View>
+        {!removida ? (
+          <Botao
+            titulo="Editar"
+            icone="create-outline"
+            variante="secundario"
+            compacto
+            aoPressionar={() => router.push({ pathname: '/pessoas/editar/[id]', params: { id: pessoa.id } })}
+          />
+        ) : null}
       </View>
 
       <Cartao style={{ gap: 0, paddingVertical: 4 }}>
@@ -178,23 +177,6 @@ export default function FichaPessoa() {
           aoPressionar={() => router.push({ pathname: '/cadastrar', params: { indicadoPor: pessoa.id } })}
         />
       ) : null}
-
-      {podeGerenciar && !removida ? (
-        <Botao titulo="Apagar dados pessoais (LGPD)" variante="perigo" compacto aoPressionar={() => setConfirmando(true)} />
-      ) : null}
-
-      {anonimizar.error ? <MensagemErro erro={anonimizar.error} /> : null}
-
-      <Confirmacao
-        visivel={confirmando}
-        titulo="Apagar dados pessoais?"
-        texto={`Nome, telefone, e-mail e descrição de ${pessoa.nome} serão apagados para sempre. A posição na árvore continua, para não quebrar a rede de quem veio depois.`}
-        rotuloConfirmar="Apagar dados"
-        perigo
-        carregando={anonimizar.isPending}
-        aoCancelar={() => setConfirmando(false)}
-        aoConfirmar={() => anonimizar.mutate(pessoa.id, { onSettled: () => setConfirmando(false) })}
-      />
     </Tela>
   );
 }
@@ -214,8 +196,8 @@ function Numero({ valor, rotulo, cor }: { valor: number; rotulo: string; cor?: s
 }
 
 const estilos = StyleSheet.create({
-  topo: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  voltar: { width: 44, height: 44, justifyContent: 'center' },
+  cabecalho: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  voltar: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   linha: {
     flexDirection: 'row',
     justifyContent: 'space-between',
