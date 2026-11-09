@@ -41,7 +41,6 @@ export default function EditarPessoa() {
             status: pessoa.status,
             indicadoPorId: pessoa.indicado_por_id,
             descricao: pessoa.descricao ?? '',
-            consentimento: true, // já registrado no cadastro
           }}
           nomeIndicadorInicial={caminho[caminho.length - 1]?.nome}
           salvando={atualizar.isPending}

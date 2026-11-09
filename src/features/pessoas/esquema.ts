@@ -23,15 +23,10 @@ export const esquemaPessoa = z
     status: z.enum(['cadastrado', 'matriculado', 'concluido']) satisfies z.ZodType<(typeof STATUS_CURSO)[number]>,
     indicadoPorId: z.string().nullable(),
     descricao: z.string().trim().max(2000, 'Descrição muito longa (máx. 2000 caracteres).'),
-    consentimento: z.boolean(),
   })
   .refine((d) => d.telefone !== '' || d.email !== '', {
     message: 'Informe pelo menos telefone ou e-mail.',
     path: ['telefone'],
-  })
-  .refine((d) => d.consentimento, {
-    message: 'Confirme que a pessoa autorizou o cadastro.',
-    path: ['consentimento'],
   });
 
 export type EntradaPessoa = z.input<typeof esquemaPessoa>;

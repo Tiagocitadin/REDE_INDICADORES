@@ -31,18 +31,19 @@ export const paletaClara = {
 
 export type Paleta = typeof paletaClara;
 
+// Escuro: base grafite neutra; o cobre fica só nos destaques
 export const paletaEscura: Paleta = {
-  fundo: "#17110D",
-  superficie: "#211913",
-  superficieSuave: "#2B2119",
-  texto: "#F2E9E1",
-  textoSuave: "#B5A496",
-  borda: "#3A2D23",
-  bordaForte: "#4C3B2E",
+  fundo: "#121314",
+  superficie: "#1C1D1F",
+  superficieSuave: "#26272A",
+  texto: "#F2F2F3",
+  textoSuave: "#A3A5AA",
+  borda: "#2E3033",
+  bordaForte: "#3F4246",
   destaque: "#F0954A",
-  destaqueTexto: "#17110D",
-  destaqueSuave: "#3D2615",
-  heroi: "#A84F12",
+  destaqueTexto: "#121314",
+  destaqueSuave: "#33261D",
+  heroi: "#9C4A12",
   heroiTexto: "#FFFFFF",
   perigo: "#F2857A",
   perigoSuave: "#3B1F1D",

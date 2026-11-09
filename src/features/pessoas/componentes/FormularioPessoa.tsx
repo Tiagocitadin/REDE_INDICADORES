@@ -6,9 +6,7 @@ import { View } from 'react-native';
 
 import {
   Avatar,
-  Aviso,
   Botao,
-  CaixaMarcacao,
   Campo,
   MensagemErro,
   Seletor,
@@ -60,7 +58,6 @@ export function FormularioPessoa({
       status: 'cadastrado',
       indicadoPorId: null,
       descricao: '',
-      consentimento: false,
       ...valoresIniciais,
     },
   });
@@ -206,23 +203,6 @@ export function FormularioPessoa({
           />
         )}
       />
-
-      {!idEditando ? (
-        <Controller
-          control={control}
-          name="consentimento"
-          render={({ field }) => (
-            <CaixaMarcacao
-              marcado={field.value}
-              aoMudar={field.onChange}
-              texto="A pessoa autorizou o cadastro do nome, telefone e e-mail dela (LGPD)."
-              erro={e.consentimento?.message}
-            />
-          )}
-        />
-      ) : null}
-
-      <Aviso texto="Cada pessoa faz um curso uma única vez. Se o e-mail ou telefone já estiver cadastrado, o app avisa." />
 
       {erro ? (
         <View style={{ gap: 8 }}>

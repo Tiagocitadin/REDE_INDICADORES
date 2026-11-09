@@ -42,7 +42,13 @@ export function GrupoChips<T>({
   aoMudar: (v: T) => void;
 }) {
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={estilos.grupo}>
+    // flexGrow 0: sem isso, na web a fileira estica e ocupa a altura da tela
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={estilos.rolagem}
+      contentContainerStyle={estilos.grupo}
+    >
       {opcoes.map((o) => (
         <Chip key={String(o.valor)} rotulo={o.rotulo} selecionado={o.valor === valor} aoPressionar={() => aoMudar(o.valor)} />
       ))}
@@ -52,5 +58,6 @@ export function GrupoChips<T>({
 
 const estilos = StyleSheet.create({
   chip: { minHeight: 36, paddingHorizontal: 14, justifyContent: 'center', borderWidth: 1 },
-  grupo: { gap: 8, paddingRight: 8 },
+  rolagem: { flexGrow: 0, flexShrink: 0 },
+  grupo: { gap: 8, paddingRight: 8, alignItems: 'center' },
 });

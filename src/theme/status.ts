@@ -7,7 +7,7 @@ export const STATUS_CURSO: readonly StatusCurso[] = ['cadastrado', 'matriculado'
 
 export const rotuloStatus: Record<StatusCurso, string> = {
   cadastrado: 'Só cadastro',
-  matriculado: 'Matriculado',
+  matriculado: 'Apresentação',
   concluido: 'Concluiu',
 };
 
