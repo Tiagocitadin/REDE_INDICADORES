@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { memo, type ComponentProps } from 'react';
-import { FlatList, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { FlatList, Linking, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar, Botao, Carregando, Etiqueta, MensagemErro, SeloStatus, Texto, Vazio } from '@/components/ui';
@@ -89,7 +89,11 @@ export default function Categorias() {
   );
 }
 
-/** Abas das 5 categorias, com o número de pessoas em cada uma */
+/**
+ * Abas das 5 categorias, com o número de pessoas em cada uma.
+ * Quebram linha quando não cabem (nada fica cortado em telas estreitas)
+ * e crescem para preencher cada linha.
+ */
 function AbasCategorias({
   atual,
   resumo,
@@ -101,12 +105,7 @@ function AbasCategorias({
 }) {
   const { cores, raio } = useTema();
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={estilos.abas}
-      accessibilityRole="tablist"
-    >
+    <View style={estilos.abas} accessibilityRole="tablist">
       {ABAS.map((aba) => {
         const ativa = aba.tipo === atual;
         const total = resumo ? aba.contagem(resumo) : null;
@@ -146,7 +145,7 @@ function AbasCategorias({
           </Pressable>
         );
       })}
-    </ScrollView>
+    </View>
   );
 }
 
@@ -260,10 +259,12 @@ function AcoesContato({ pessoa }: { pessoa: PessoaDoGrupo }) {
 
 const estilos = StyleSheet.create({
   coluna: { flex: 1, width: '100%', maxWidth: LARGURA_MAX_CONTEUDO, alignSelf: 'center' },
-  abas: { gap: 8, paddingRight: 8 },
+  abas: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   aba: {
+    flexGrow: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 8,
     minHeight: 44,
     paddingHorizontal: 14,
