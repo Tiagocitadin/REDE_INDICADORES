@@ -27,7 +27,7 @@ export default function Painel() {
         />
       ) : resumo.data ? (
         <View style={{ gap: 16 }}>
-          <ImpactoElos resumo={resumo.data} />
+          <ImpactoElos resumo={resumo.data} cursoId={cursoId} />
           <Ranking cursoId={cursoId} />
         </View>
       ) : null}
