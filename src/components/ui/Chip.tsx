@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { useTema } from '@/theme/useTema';
 import { Texto } from './Texto';
@@ -31,7 +31,10 @@ export function Chip({ rotulo, selecionado, aoPressionar }: ChipProps) {
 
 type Opcao<T> = { valor: T; rotulo: string };
 
-/** Fileira de filtros com rolagem horizontal (ex.: cursos) */
+/**
+ * Fileira de filtros (ex.: cursos). Quebra linha quando não cabe,
+ * para nenhum filtro ficar escondido fora da tela (no computador não dá para arrastar).
+ */
 export function GrupoChips<T>({
   opcoes,
   valor,
@@ -42,22 +45,15 @@ export function GrupoChips<T>({
   aoMudar: (v: T) => void;
 }) {
   return (
-    // flexGrow 0: sem isso, na web a fileira estica e ocupa a altura da tela
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={estilos.rolagem}
-      contentContainerStyle={estilos.grupo}
-    >
+    <View style={estilos.grupo}>
       {opcoes.map((o) => (
         <Chip key={String(o.valor)} rotulo={o.rotulo} selecionado={o.valor === valor} aoPressionar={() => aoMudar(o.valor)} />
       ))}
-    </ScrollView>
+    </View>
   );
 }
 
 const estilos = StyleSheet.create({
   chip: { minHeight: 36, paddingHorizontal: 14, justifyContent: 'center', borderWidth: 1 },
-  rolagem: { flexGrow: 0, flexShrink: 0 },
-  grupo: { gap: 8, paddingRight: 8, alignItems: 'center' },
+  grupo: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center' },
 });
