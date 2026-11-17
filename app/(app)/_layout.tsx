@@ -61,9 +61,14 @@ export default function AppLayout() {
         <Tabs.Screen name="painel" options={{ title: 'Painel', tabBarIcon: icone('grid-outline') }} />
         <Tabs.Screen name="arvore" options={{ title: 'Árvore', tabBarIcon: icone('git-network-outline') }} />
         <Tabs.Screen name="cadastrar" options={{ title: 'Cadastrar', tabBarIcon: icone('person-add-outline') }} />
+        <Tabs.Screen name="categorias" options={{ title: 'Categorias', tabBarIcon: icone('albums-outline') }} />
         <Tabs.Screen name="pessoas" options={{ title: 'Pessoas', tabBarIcon: icone('people-outline') }} />
         <Tabs.Screen name="cursos" options={{ title: 'Cursos', tabBarIcon: icone('school-outline') }} />
-        <Tabs.Screen name="ajustes" options={{ title: 'Ajustes', tabBarIcon: icone('settings-outline') }} />
+        {/* no celular, Ajustes sai do menu de baixo (abre pelo avatar na barra do topo) para caber tudo */}
+        <Tabs.Screen
+          name="ajustes"
+          options={{ title: 'Ajustes', tabBarIcon: icone('settings-outline'), href: telaLarga ? undefined : null }}
+        />
       </Tabs>
     </ComBarraTopo.Provider>
   );

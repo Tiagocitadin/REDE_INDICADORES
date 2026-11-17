@@ -1,50 +1,45 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { memo } from 'react';
-import { FlatList, Linking, Pressable, StyleSheet, View } from 'react-native';
+import { memo, type ComponentProps } from 'react';
+import { FlatList, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar, Botao, Carregando, Etiqueta, MensagemErro, SeloStatus, Texto, Vazio } from '@/components/ui';
 import { useNomesCursos } from '@/features/cursos/cursos';
 import { FiltroCurso } from '@/features/cursos/FiltroCurso';
-import { GRUPOS, ehTipoGrupo, useGrupoPessoas, type PessoaDoGrupo } from '@/features/pessoas/grupos';
+import { GRUPOS, ehTipoGrupo, useGrupoPessoas, type PessoaDoGrupo, type TipoGrupo } from '@/features/pessoas/grupos';
+import { useResumoRede, type ResumoRede } from '@/features/rede/rede';
 import { formatarData, formatarTelefone, somenteDigitos } from '@/lib/format';
 import { LARGURA_MAX_CONTEUDO } from '@/theme/tokens';
 import { useTema } from '@/theme/useTema';
 
+type NomeIcone = ComponentProps<typeof Ionicons>['name'];
+
+/** Ordem das abas e o número de cada uma (o mesmo dos cards do Painel) */
+const ABAS: { tipo: TipoGrupo; icone: NomeIcone; contagem: (r: ResumoRede) => number }[] = [
+  { tipo: 'contatos', icone: 'call-outline', contagem: (r) => r.cadastrados },
+  { tipo: 'apresentacoes', icone: 'easel-outline', contagem: (r) => r.matriculados },
+  { tipo: 'vidas', icone: 'heart-outline', contagem: (r) => r.concluidos },
+  { tipo: 'diretas', icone: 'person-outline', contagem: (r) => r.diretas },
+  { tipo: 'indiretas', icone: 'git-branch-outline', contagem: (r) => r.indiretas },
+];
+
 /**
- * Lista aberta ao tocar num card do Painel:
- * vidas resgatadas, apresentações, contatos, diretas ou indiretas.
- * Na lista de Contatos, cada pessoa tem botões para ligar, WhatsApp e e-mail.
+ * Menu "Categorias": as pessoas separadas por categoria, com abas no topo
+ * para trocar de uma para outra sem voltar ao Painel.
+ * Os cards do Painel abrem esta tela já na aba certa (?tipo=contatos etc.).
  */
-export default function GrupoPessoas() {
-  const params = useLocalSearchParams<{ tipo: string; curso?: string }>();
+export default function Categorias() {
+  const params = useLocalSearchParams<{ tipo?: string; curso?: string }>();
   const { cores } = useTema();
+  const tipo: TipoGrupo = ehTipoGrupo(params.tipo) ? params.tipo : 'contatos';
+  const cursoId = params.curso || null;
 
-  if (!ehTipoGrupo(params.tipo)) {
-    return (
-      <SafeAreaView edges={['left', 'right']} style={{ flex: 1, backgroundColor: cores.fundo, padding: 20 }}>
-        <Vazio
-          titulo="Lista não encontrada"
-          acao={<Botao titulo="Voltar ao Painel" variante="secundario" aoPressionar={() => router.replace('/painel')} />}
-        />
-      </SafeAreaView>
-    );
-  }
-
-  return <ListaGrupo tipo={params.tipo} cursoInicial={params.curso || null} />;
-}
-
-function ListaGrupo({ tipo, cursoInicial }: { tipo: keyof typeof GRUPOS; cursoInicial: string | null }) {
-  const { cores } = useTema();
   const grupo = GRUPOS[tipo];
-  const cursoId = cursoInicial;
+  const resumo = useResumoRede(null, cursoId);
   const nomesCursos = useNomesCursos();
   const lista = useGrupoPessoas(tipo, cursoId);
   const pessoas = lista.data?.pages.flat() ?? [];
-  const ehContatos = tipo === 'contatos';
-
-  const voltar = () => (router.canGoBack() ? router.back() : router.replace('/painel'));
 
   return (
     <SafeAreaView edges={['left', 'right']} style={{ flex: 1, backgroundColor: cores.fundo }}>
@@ -58,37 +53,100 @@ function ListaGrupo({ tipo, cursoInicial }: { tipo: keyof typeof GRUPOS; cursoIn
             if (lista.hasNextPage && !lista.isFetchingNextPage) lista.fetchNextPage();
           }}
           refreshing={lista.isRefetching && !lista.isFetchingNextPage}
-          onRefresh={lista.refetch}
+          onRefresh={() => {
+            lista.refetch();
+            resumo.refetch();
+          }}
           ListHeaderComponent={
             <View style={{ gap: 14, marginBottom: 8 }}>
-              <View style={estilos.topo}>
-                <Pressable accessibilityRole="button" accessibilityLabel="Voltar" onPress={voltar} hitSlop={10} style={estilos.voltar}>
-                  <Ionicons name="chevron-back" size={24} color={cores.texto} />
-                </Pressable>
-                <View style={{ flex: 1 }}>
-                  <Texto variante="titulo" accessibilityRole="header">
-                    {grupo.titulo}
-                  </Texto>
-                  <Texto variante="pequeno" suave>
-                    {grupo.descricao}
-                  </Texto>
-                </View>
-              </View>
-              <FiltroCurso
-                valor={cursoId}
-                aoMudar={(novo) => router.setParams({ curso: novo ?? '' })}
+              <Texto variante="titulo" accessibilityRole="header">
+                Categorias
+              </Texto>
+
+              <AbasCategorias
+                atual={tipo}
+                resumo={resumo.data}
+                aoMudar={(novo) => router.setParams({ tipo: novo })}
               />
+
+              <FiltroCurso valor={cursoId} aoMudar={(novo) => router.setParams({ curso: novo ?? '' })} />
+
+              <Texto variante="pequeno" suave>
+                {grupo.descricao}
+              </Texto>
+
               {lista.error ? <MensagemErro erro={lista.error} aoTentar={lista.refetch} /> : null}
             </View>
           }
           renderItem={({ item }) => (
-            <ItemGrupo pessoa={item} nomeCurso={nomesCursos.get(item.curso_id)} contato={ehContatos} />
+            <ItemGrupo pessoa={item} nomeCurso={nomesCursos.get(item.curso_id)} contato={tipo === 'contatos'} />
           )}
           ListEmptyComponent={lista.isPending ? <Carregando /> : <Vazio titulo={grupo.vazio} />}
           ListFooterComponent={lista.isFetchingNextPage ? <Carregando texto="Carregando mais…" /> : null}
         />
       </View>
     </SafeAreaView>
+  );
+}
+
+/** Abas das 5 categorias, com o número de pessoas em cada uma */
+function AbasCategorias({
+  atual,
+  resumo,
+  aoMudar,
+}: {
+  atual: TipoGrupo;
+  resumo?: ResumoRede;
+  aoMudar: (tipo: TipoGrupo) => void;
+}) {
+  const { cores, raio } = useTema();
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={estilos.abas}
+      accessibilityRole="tablist"
+    >
+      {ABAS.map((aba) => {
+        const ativa = aba.tipo === atual;
+        const total = resumo ? aba.contagem(resumo) : null;
+        return (
+          <Pressable
+            key={aba.tipo}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: ativa }}
+            accessibilityLabel={`${GRUPOS[aba.tipo].titulo}${total != null ? `, ${total}` : ''}`}
+            onPress={() => aoMudar(aba.tipo)}
+            style={({ pressed }) => [
+              estilos.aba,
+              {
+                borderRadius: raio.md,
+                backgroundColor: ativa ? cores.destaque : cores.superficie,
+                borderColor: ativa ? cores.destaque : cores.borda,
+                opacity: pressed ? 0.85 : 1,
+              },
+            ]}
+          >
+            <Ionicons name={aba.icone} size={18} color={ativa ? cores.destaqueTexto : cores.textoSuave} />
+            <Texto variante="pequeno" negrito cor={ativa ? cores.destaqueTexto : cores.texto}>
+              {GRUPOS[aba.tipo].titulo}
+            </Texto>
+            {total != null ? (
+              <View
+                style={[
+                  estilos.contagem,
+                  { backgroundColor: ativa ? 'rgba(255,255,255,0.22)' : cores.superficieSuave },
+                ]}
+              >
+                <Texto variante="legenda" negrito cor={ativa ? cores.destaqueTexto : cores.textoSuave}>
+                  {total}
+                </Texto>
+              </View>
+            ) : null}
+          </Pressable>
+        );
+      })}
+    </ScrollView>
   );
 }
 
@@ -158,21 +216,15 @@ function AcoesContato({ pessoa }: { pessoa: PessoaDoGrupo }) {
 
   return (
     <View style={[estilos.acoes, { borderTopColor: cores.borda }]}>
-      {digitos ? (
-        <Texto variante="pequeno" negrito selectable style={{ flexBasis: '100%' }}>
-          {formatarTelefone(pessoa.telefone)}
-          {pessoa.email ? (
-            <Texto variante="pequeno" suave>
-              {'  ·  '}
-              {pessoa.email}
-            </Texto>
-          ) : null}
-        </Texto>
-      ) : (
-        <Texto variante="pequeno" negrito selectable style={{ flexBasis: '100%' }}>
-          {pessoa.email}
-        </Texto>
-      )}
+      <Texto variante="pequeno" negrito selectable style={{ flexBasis: '100%' }}>
+        {digitos ? formatarTelefone(pessoa.telefone) : pessoa.email}
+        {digitos && pessoa.email ? (
+          <Texto variante="pequeno" suave>
+            {'  ·  '}
+            {pessoa.email}
+          </Texto>
+        ) : null}
+      </Texto>
       {whatsapp ? (
         <Botao
           titulo="WhatsApp"
@@ -208,8 +260,16 @@ function AcoesContato({ pessoa }: { pessoa: PessoaDoGrupo }) {
 
 const estilos = StyleSheet.create({
   coluna: { flex: 1, width: '100%', maxWidth: LARGURA_MAX_CONTEUDO, alignSelf: 'center' },
-  topo: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  voltar: { width: 40, height: 44, justifyContent: 'center' },
+  abas: { gap: 8, paddingRight: 8 },
+  aba: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    minHeight: 44,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+  },
+  contagem: { minWidth: 24, paddingHorizontal: 7, paddingVertical: 1, borderRadius: 999, alignItems: 'center' },
   cartao: { overflow: 'hidden' },
   linha: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, minHeight: 64 },
   etiquetas: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },

@@ -25,7 +25,7 @@ export function ImpactoElos({
 
   const abrir = (tipo: TipoGrupo) =>
     router.push({
-      pathname: "/pessoas/grupo/[tipo]",
+      pathname: "/categorias",
       params: { tipo, curso: cursoId ?? "" },
     });
 
