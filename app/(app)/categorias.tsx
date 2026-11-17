@@ -16,12 +16,13 @@ import { useTema } from '@/theme/useTema';
 type NomeIcone = ComponentProps<typeof Ionicons>['name'];
 
 /** Ordem das abas e o número de cada uma (o mesmo dos cards do Painel) */
-const ABAS: { tipo: TipoGrupo; icone: NomeIcone; contagem: (r: ResumoRede) => number }[] = [
-  { tipo: 'contatos', icone: 'call-outline', contagem: (r) => r.cadastrados },
-  { tipo: 'apresentacoes', icone: 'easel-outline', contagem: (r) => r.matriculados },
-  { tipo: 'vidas', icone: 'heart-outline', contagem: (r) => r.concluidos },
-  { tipo: 'diretas', icone: 'person-outline', contagem: (r) => r.diretas },
-  { tipo: 'indiretas', icone: 'git-branch-outline', contagem: (r) => r.indiretas },
+/** rótulo curto na aba para as 5 caberem numa linha só */
+const ABAS: { tipo: TipoGrupo; rotulo: string; icone: NomeIcone; contagem: (r: ResumoRede) => number }[] = [
+  { tipo: 'contatos', rotulo: 'Contatos', icone: 'call-outline', contagem: (r) => r.cadastrados },
+  { tipo: 'apresentacoes', rotulo: 'Apresentações', icone: 'easel-outline', contagem: (r) => r.matriculados },
+  { tipo: 'vidas', rotulo: 'Vidas resgatadas', icone: 'heart-outline', contagem: (r) => r.concluidos },
+  { tipo: 'diretas', rotulo: 'Diretas', icone: 'person-outline', contagem: (r) => r.diretas },
+  { tipo: 'indiretas', rotulo: 'Indiretas', icone: 'git-branch-outline', contagem: (r) => r.indiretas },
 ];
 
 /**
@@ -71,7 +72,8 @@ export default function Categorias() {
 
               <FiltroCurso valor={cursoId} aoMudar={(novo) => router.setParams({ curso: novo ?? '' })} />
 
-              <Texto variante="pequeno" suave>
+              <Texto variante="subtitulo">{grupo.titulo}</Texto>
+              <Texto variante="pequeno" suave style={{ marginTop: -10 }}>
                 {grupo.descricao}
               </Texto>
 
@@ -126,9 +128,9 @@ function AbasCategorias({
               },
             ]}
           >
-            <Ionicons name={aba.icone} size={18} color={ativa ? cores.destaqueTexto : cores.textoSuave} />
-            <Texto variante="pequeno" negrito cor={ativa ? cores.destaqueTexto : cores.texto}>
-              {GRUPOS[aba.tipo].titulo}
+            <Ionicons name={aba.icone} size={16} color={ativa ? cores.destaqueTexto : cores.textoSuave} />
+            <Texto variante="pequeno" negrito numberOfLines={1} cor={ativa ? cores.destaqueTexto : cores.texto}>
+              {aba.rotulo}
             </Texto>
             {total != null ? (
               <View
@@ -259,18 +261,18 @@ function AcoesContato({ pessoa }: { pessoa: PessoaDoGrupo }) {
 
 const estilos = StyleSheet.create({
   coluna: { flex: 1, width: '100%', maxWidth: LARGURA_MAX_CONTEUDO, alignSelf: 'center' },
-  abas: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  abas: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   aba: {
     flexGrow: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    minHeight: 44,
-    paddingHorizontal: 14,
+    gap: 6,
+    minHeight: 40,
+    paddingHorizontal: 10,
     borderWidth: 1,
   },
-  contagem: { minWidth: 24, paddingHorizontal: 7, paddingVertical: 1, borderRadius: 999, alignItems: 'center' },
+  contagem: { minWidth: 22, paddingHorizontal: 6, borderRadius: 999, alignItems: 'center' },
   cartao: { overflow: 'hidden' },
   linha: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, minHeight: 64 },
   etiquetas: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
